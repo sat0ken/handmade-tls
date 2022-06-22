@@ -1,0 +1,77 @@
+ContentType: 16
+Version: 0303
+Length: 0000
+HandshakeProtocol:
+  HandshakeType: 01
+  Length: 000000
+  Version: 0303
+  Random: 0000000000000000000000000000000000000000000000000000000000000000
+  SessionIDLength: 20 #=32
+  SessionID: 0000000000000000000000000000000000000000000000000000000000000000
+  CipherSuitesLength: 0002
+  CipherSuites:
+  - CipherSuite: 1301 # TLS_AES_128_GCM_SHA256
+  CompressionMethodLength: 01
+  CompressionMethod: 00
+  ExtensionLength: 0000
+  Extension:
+  - StatueRequest:
+    Type: 0005
+    Length: 0005
+    CertificateStatusType: 01
+    ResponderIdListLength: 0000
+    RequestExtensionLength: 0000
+  - SupportedGroups:
+    Type: 000a
+    Length: 0004
+    SupportedGroupsListLength: 0002
+    SupportedGroup: 001d
+  - EcPointFormats:
+    Type: 000b
+    Length: 0002
+    EcPointFormatsLength: 01
+    EllipticCurvesPointFormats: 00
+  - SignatureAlgorithms:
+    Type: 000d
+    Length: 001a
+    SigHashAlgoLength: 0018
+    SigHashAlgos:
+      - RSA_PSS_RSAE_SHA256: 0804
+      - ECDSA_SECP256R1_SHA256: 0403
+      - ED25519: 0807
+      - RSA_PSS_RSAE_SHA384: 0805
+      - RSA_PSS_RSAE_SHA512: 0806
+      - RSA_PKCS1_SHA256: 0401
+      - RSA_PKCS1_SHA384: 0501
+      - RSA_PKCS1_SHA512: 0601
+      - ECDSA_SECP384R1_SHA384: 0503
+      - ECDSA_SECP521R1_SHA512: 0603
+      - RSA_PKCS1_SHA1: 0201
+      - ECDSA_SHA1: 0203
+  - RenegotiationInfo:
+    Type: ff01
+    Length: 0001
+    RenegotiationInfoExtension: 00
+  - ApplicationLayerProtocolNegotiation:
+    Type: 0010
+    Length: 0005
+    ALPNExtensionLength: 0003
+    ALPNProtocol:
+      - ALPNStringLength: 02
+        ALPNNextProtocol: 6832
+  - SignedCertificateTimestamp:
+    Type: 0012
+    Length: 0000
+  - SupportedVersions:
+    Type: 002b
+    Length: 0003
+    SupportedVersionsLength: 02
+    SupportedVersion: 0304
+  - KeyShare:
+    Type: 0033
+    Length: 0026
+    KeyShareExtension:
+      ClientKeyShareLength: 0024
+      Group: 001d
+      KeyExchangeLength: 0020
+      KeyExchange: 2fe57da347cd62431528daac5fbb290730fff684afc4cfc2ed90995f58cb3b74
