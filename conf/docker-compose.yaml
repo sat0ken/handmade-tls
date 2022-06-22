@@ -1,0 +1,12 @@
+version: "3.3"
+services:
+  nginx:
+    container_name: nginx
+    restart: always
+    image: nginx:1.22.0-alpine
+    volumes:
+    - ./nginx.conf:/etc/nginx/conf.d/nginx.conf
+    - ./localhost.pem:/etc/certs/localhost.pem
+    - ./localhost-key.pem:/etc/certs/localhost-key.pem
+    ports:
+    - 8443:443
