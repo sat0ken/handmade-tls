@@ -29,6 +29,5 @@ func main() {
 		fmt.Print("> ")
 	}
 	defer conn.Close()
-	//buffer := make([]byte, 65535)
 
 }
