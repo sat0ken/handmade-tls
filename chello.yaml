@@ -74,4 +74,4 @@ HandshakeProtocol:
       ClientKeyShareLength: 0024
       Group: 001d
       KeyExchangeLength: 0020
-      KeyExchange: 2fe57da347cd62431528daac5fbb290730fff684afc4cfc2ed90995f58cb3b74
+      KeyExchange: 807777060bdd942ecf28cb50788e5b3245df28a4093a708f6e80669ce0cd2417

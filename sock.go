@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"encoding/hex"
 	"fmt"
-	"net"
 	"log"
+	"net"
 	"os"
 )
 
@@ -17,13 +17,18 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Print("> ")
+	buffer := make([]byte, 65535)
 	for {
 		scanner.Scan()
 		text := scanner.Text()
 		packet, _ := hex.DecodeString(text)
 		conn.Write(packet)
-		var b []byte
-		conn.Read(b)
-		fmt.Printf("recv : %x\n", b)
+
+		plen, _ := conn.Read(buffer)
+		fmt.Printf("recv : %x\n", buffer[:plen])
+		fmt.Print("> ")
 	}
+	defer conn.Close()
+	//buffer := make([]byte, 65535)
+
 }
