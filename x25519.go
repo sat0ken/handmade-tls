@@ -16,5 +16,5 @@ func main() {
 	serverPubKey, _ := hex.DecodeString(*pub)
 	sharedKey, _ := curve25519.X25519(privateKey, serverPubKey)
 
-	fmt.Printf("sharedkey is %x\n", sharedKey)
+	fmt.Printf("%x", sharedKey)
 }

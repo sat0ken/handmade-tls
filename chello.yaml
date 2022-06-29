@@ -1,41 +1,41 @@
-ContentType: 16
-Version: 0303
-Length: 0000
-HandshakeProtocol:
-  HandshakeType: 01
-  Length: 000000
-  Version: 0303
-  Random: 0000000000000000000000000000000000000000000000000000000000000000
-  SessionIDLength: 20 #=32
-  SessionID: 0000000000000000000000000000000000000000000000000000000000000000
-  CipherSuitesLength: 0002
-  CipherSuites:
-  - CipherSuite: 1301 # TLS_AES_128_GCM_SHA256
-  CompressionMethodLength: 01
-  CompressionMethod: 00
-  ExtensionLength: 0000
-  Extension:
-  - StatueRequest:
-    Type: 0005
-    Length: 0005
-    CertificateStatusType: 01
-    ResponderIdListLength: 0000
-    RequestExtensionLength: 0000
-  - SupportedGroups:
-    Type: 000a
-    Length: 0004
-    SupportedGroupsListLength: 0002
-    SupportedGroup: 001d
-  - EcPointFormats:
-    Type: 000b
-    Length: 0002
-    EcPointFormatsLength: 01
-    EllipticCurvesPointFormats: 00
-  - SignatureAlgorithms:
-    Type: 000d
-    Length: 001a
-    SigHashAlgoLength: 0018
-    SigHashAlgos:
+contentType: 16
+version: 0303
+length: 0000
+handshakeProtocol:
+  handshakeType: 01
+  length: 000000
+  version: 0303
+  random: 0000000000000000000000000000000000000000000000000000000000000000
+  sessionIDLength: 20 #=32
+  sessionID: 0000000000000000000000000000000000000000000000000000000000000000
+  cipherSuitesLength: 0002
+  cipherSuites:
+  - cipherSuite: 1301 # TLS_AES_128_GCM_SHA256
+  compressionMethodLength: 01
+  compressionMethod: 00
+  extensionLength: 0000
+  extension:
+  - statueRequest:
+    type: 0005
+    length: 0005
+    certificateStatusType: 01
+    responderIdListLength: 0000
+    requestExtensionLength: 0000
+  - supportedGroups:
+    type: 000a
+    length: 0004
+    supportedGroupsListLength: 0002
+    supportedGroup: 001d
+  - ecPointFormats:
+    type: 000b
+    length: 0002
+    ecPointFormatsLength: 01
+    ellipticCurvesPointFormats: 00
+  - signatureAlgorithms:
+    type: 000d
+    length: 001a
+    sigHashAlgoLength: 0018
+    sigHashAlgos:
       - RSA_PSS_RSAE_SHA256: 0804
       - ECDSA_SECP256R1_SHA256: 0403
       - ED25519: 0807
@@ -48,30 +48,30 @@ HandshakeProtocol:
       - ECDSA_SECP521R1_SHA512: 0603
       - RSA_PKCS1_SHA1: 0201
       - ECDSA_SHA1: 0203
-  - RenegotiationInfo:
-    Type: ff01
-    Length: 0001
-    RenegotiationInfoExtension: 00
-  - ApplicationLayerProtocolNegotiation:
-    Type: 0010
-    Length: 0005
+  - renegotiationInfo:
+    type: ff01
+    length: 0001
+    renegotiationInfoExtension: 00
+  - applicationLayerProtocolNegotiation:
+    type: 0010
+    length: 0005
     ALPNExtensionLength: 0003
     ALPNProtocol:
       - ALPNStringLength: 02
         ALPNNextProtocol: 6832
-  - SignedCertificateTimestamp:
-    Type: 0012
-    Length: 0000
-  - SupportedVersions:
-    Type: 002b
-    Length: 0003
-    SupportedVersionsLength: 02
-    SupportedVersion: 0304
-  - KeyShare:
-    Type: 0033
-    Length: 0026
-    KeyShareExtension:
-      ClientKeyShareLength: 0024
-      Group: 001d
-      KeyExchangeLength: 0020
-      KeyExchange: 807777060bdd942ecf28cb50788e5b3245df28a4093a708f6e80669ce0cd2417
+  - signedCertificateTimestamp:
+    type: 0012
+    length: 0000
+  - supportedVersions:
+    type: 002b
+    length: 0003
+    supportedVersionsLength: 02
+    supportedVersion: 0304
+  - keyShare:
+    type: 0033
+    length: 0026
+    keyShareExtension:
+      clientKeyShareLength: 0024
+      group: 001d
+      keyExchangeLength: 0020
+      keyExchange: d20be586e65aef98e983a7ccf23ed8944a2afc04cbec4a2d403b13a7e5689372

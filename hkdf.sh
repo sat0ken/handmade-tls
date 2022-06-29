@@ -22,11 +22,8 @@ elif [[ "$op" = "expand" || "$op" = "expandlabel" ]]; then
 		contextlen=$(echo -n "$hexcontext" | wc -c | awk '{print $1}')
 		let contextlen=contextlen/2
 		hexinfo=$(printf "%04x" "$length" )$(printf "%02x" "$labellen")
-		echo $hexinfo
 		hexinfo=${hexinfo}$(echo -en "tls13 $label" | xxd -p )
-		echo $hexinfo
 		hexinfo=${hexinfo}$(printf "%02x" "$contextlen")"$hexcontext"
-		echo $hexinfo
 	fi
 
 	let hexlength="$length"*2
