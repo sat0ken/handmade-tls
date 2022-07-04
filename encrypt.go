@@ -3,31 +3,58 @@ package main
 import (
 	"crypto/aes"
 	"crypto/cipher"
-	"encoding/hex"
+	"encoding/binary"
+	//"encoding/hex"
 	"flag"
 	"fmt"
 	"log"
 )
 
-func encryptClientMessage(message, key []byte) {
+type TLSInfo struct {
+	key []byte
+	iv []byte
+	message  []byte
+}
+
+// TLSメッセージのシーケンス番号を8byteのnonceにして返す
+func getNonce(i, length int) []byte {
+	b := make([]byte, length)
+	binary.BigEndian.PutUint64(b, uint64(i))
+	return b
+}
+
+// TLS1.3用
+// https://tex2e.github.io/rfc-translater/html/rfc8446.html
+// シーケンス番号とwrite_ivをxorした値がnonceになる
+func getXORNonce(seqnum, writeiv []byte) []byte {
+	nonce := make([]byte, len(writeiv))
+	copy(nonce, writeiv)
+
+	for i, b := range seqnum {
+		nonce[4+i] ^= b
+	}
+	return nonce
+}
+
+func encryptClientMessage(tlsinfo TLSInfo) {
 	var nonce, add []byte
 
-	block, _ := aes.NewCipher(key)
+	block, _ := aes.NewCipher(tlsinfo.key)
 	aesgcm, _ := cipher.NewGCM(block)
 
-	encmessage := aesgcm.Seal(nil, nonce, message, add)
+	encmessage := aesgcm.Seal(nil, nonce, tlsinfo.message, add)
 
 	fmt.Printf("message is %s\n", encmessage)
 
 }
 
-func decryptServerMessage(message, key []byte) {
+func decryptServerMessage(tlsinfo TLSInfo) {
 	var nonce, add []byte
 
-	block, _ := aes.NewCipher(key)
+	block, _ := aes.NewCipher(tlsinfo.key)
 	aesgcm, _ := cipher.NewGCM(block)
 
-	plainmessage, err := aesgcm.Open(nil, nonce, message, add)
+	plainmessage, err := aesgcm.Open(nil, nonce, tlsinfo.message, add)
 	if err != nil {
 		log.Fatalf("decrypt message err : %x\n", err)
 	}
@@ -35,17 +62,26 @@ func decryptServerMessage(message, key []byte) {
 }
 
 func main() {
-	key := flag.String("key", "value", "key")
+	key := flag.String("key", "", "key")
+	iv := flag.String("iv", "", "iv")
 	enc := flag.String("enc", "", "encrypt message")
-	dec := flag.String("dec", "", "decryt message")
+	dec := flag.String("dec", "", "decrypt message")
 	flag.Parse()
 
-	privatekey, _ := hex.DecodeString(*key)
+	tlsinfo := TLSInfo{
+		key: []byte(*key),
+		iv: []byte(*iv),
+	}
+
 	if *enc != "" {
-		encryptClientMessage([]byte(*enc), privatekey)
+		tlsinfo.message = []byte(*enc)
+		fmt.Printf("%x\n", tlsinfo.key)
+		//encryptClientMessage(tlsinfo)
 	}
 	if *dec != "" {
-		decryptServerMessage([]byte(*dec), privatekey)
+		tlsinfo.message = []byte(*enc)
+		fmt.Printf("%+v\n", tlsinfo)
+		//decryptServerMessage(tlsinfo)
 	}
 
 }
