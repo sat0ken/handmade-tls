@@ -3,19 +3,19 @@
 # https://tls13.xargs.org/
 # RFC8448の3. Simple 1-RTT Handshake
 
-# TODO: opensslコマンドでセットするように要変更
-clientPrivateKey=$(openssl pkey -noout -text < private.key | grep priv -A3 | grep -v priv | sed -e "s/://g" -e "s/ //g" -z -e "s/\\n//g")
+clientserverhello=$(./clienthello.sh | tail -c +11)
+clientserverhello+=$1
+sha384HashedMessage=$(echo -n $clientserverhello | xxd -r -p |openssl sha384 | awk '{print $2}')
 
-# TODO: yqコマンドでセットするように要変更 
-serverPublicKey=$(yq .handshakeProtocol.extension[1].keyShareExtension.keyExchange shello.yaml | grep -v \- | grep -v null)
+clientPrivateKey=$(openssl pkey -noout -text < private.key | grep priv -A3 | grep -v priv | sed -e "s/://g" -e "s/ //g" -z -e "s/\\n//g")
+length=${#1}
+startlength=$(expr $length - 64)
+# ServerHelloの末尾にある32byteのKeyshareをセット
+serverPublicKey=${1:$startlength:64}
 
 # ECDHE鍵交換
-sharedSecret=$(./x25519 -priv $clientPrivateKey -pub $serverPublicKey)
-printf "sharedSecret is $sharedSecret\n"
-
-# TODO: 要変更 
-clientserverhello=010000c3030300000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000000002130201000078000500050100000000000a00040002001d000b00020100000d001a0018080404030807080508060401050106010503060302010203ff0100010000100005000302683200120000002b0003020304003300260024001d0020807777060bdd942ecf28cb50788e5b3245df28a4093a708f6e80669ce0cd241702000076030301348be1037755cfb50a8671f5dea469392b4be02cbb2013ba0c55db2ff12ca6200000000000000000000000000000000000000000000000000000000000000000130200002e002b0002030400330024001d0020325fa98558215b6e4b1af9d6ea4ba835b751ef5b050a78a1312c62e449df874e
-sha384HashedMessage=$(echo -n $clientserverhello | xxd -r -p |openssl sha384 | awk '{print $2}')
+sharedSecret=$(./tools/x25519 -priv $clientPrivateKey -pub $serverPublicKey)
+#printf "sharedSecret is $sharedSecret\n"
 
 zerokey=000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 
@@ -51,13 +51,18 @@ serverHandshakeIV=$(./hkdf-384.sh expandlabel $serverHandshakeTraffic "iv" "" 12
 #printf "serverHandshakeKey is $serverHandshakeKey\n"
 #printf "serverHandshakeIV is $serverHandshakeIV\n"
 
+if [ -e "./key.yaml" ]; then
+  rm ./key.yaml
+fi
+
 ckey="${clientHandshakeKey}" civ="${clientHandshakeIV}" skey="${serverHandshakeKey}" siv="${serverHandshakeIV}" yq -n "
     (.handshake.clientkey = env(ckey)) |
     (.handshake.clientiv = env(civ))|
     (.handshake.serverkey = env(skey)) |
     (.handshake.serveriv = env(siv))
-"
+" >> key.yaml
+
 cfin="${clientFinishedKey}" sfin="${serverFinishedKey}" yq -n "
     (.finished.clientkey = env(cfin)) |
     (.finished.serverkey =env(sfin))
-"
+" >> key.yaml
