@@ -10,7 +10,7 @@ handshakeProtocol:
   sessionID: 0000000000000000000000000000000000000000000000000000000000000000
   cipherSuitesLength: 0002
   cipherSuites:
-  - cipherSuite: 1302 # TLS_AES_128_GCM_SHA256
+  - cipherSuite: 1302 # TLS_AES_128_GCM_SHA384
   compressionMethodLength: 01
   compressionMethod: 00
   extensionLength: 0000
@@ -74,4 +74,4 @@ handshakeProtocol:
       clientKeyShareLength: 0024
       group: 001d
       keyExchangeLength: 0020
-      keyExchange: 807777060bdd942ecf28cb50788e5b3245df28a4093a708f6e80669ce0cd2417
+      keyExchange: d20be586e65aef98e983a7ccf23ed8944a2afc04cbec4a2d403b13a7e5689372
