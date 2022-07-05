@@ -4,11 +4,10 @@
 # RFC8448の3. Simple 1-RTT Handshake
 
 # TODO: opensslコマンドでセットするように要変更
-#clientPrivateKey=0000000000000000000000000000000000000000000000000000000000000000
 clientPrivateKey=$(openssl pkey -noout -text < private.key | grep priv -A3 | grep -v priv | sed -e "s/://g" -e "s/ //g" -z -e "s/\\n//g")
 
 # TODO: yqコマンドでセットするように要変更 
-serverPublicKey=325fa98558215b6e4b1af9d6ea4ba835b751ef5b050a78a1312c62e449df874e
+serverPublicKey=$(yq .handshakeProtocol.extension[1].keyShareExtension.keyExchange shello.yaml | grep -v \- | grep -v null)
 
 # ECDHE鍵交換
 sharedSecret=$(./x25519 -priv $clientPrivateKey -pub $serverPublicKey)
@@ -26,10 +25,9 @@ emptyHash=$(openssl sha384 < /dev/null | awk '{print $2}')
 
 # derived secretを作成
 derivedSecret=$(./hkdf-384.sh expandlabel $earlySecret "derived" $emptyHash 48)
-printf "derivedSecret is $derivedSecret\n"
+
 # handshake secretを作成
 handshakeSecret=$(./hkdf-384.sh extract $derivedSecret $sharedSecret)
-printf "handshakeSecret is $handshakeSecret\n"
 
 clientHandshakeTraffic=$(./hkdf-384.sh expandlabel $handshakeSecret "c hs traffic" $sha384HashedMessage 48)
 serverHandshakeTraffic=$(./hkdf-384.sh expandlabel $handshakeSecret "s hs traffic" $sha384HashedMessage 48)
@@ -43,16 +41,15 @@ serverHandshakeKey=$(./hkdf-384.sh  expandlabel $serverHandshakeTraffic "key" ""
 clientHandshakeIV=$(./hkdf-384.sh expandlabel $clientHandshakeTraffic "iv" "" 12)
 serverHandshakeIV=$(./hkdf-384.sh expandlabel $serverHandshakeTraffic "iv" "" 12)
 
-printf "sha256HashedMessage is $sha256HashedMessage\n"
-printf "clientHandshakeTraffic is $clientHandshakeTraffic\n"
-printf "serverHandshakeTraffic is $serverHandshakeTraffic\n"
-printf "clientHandshakeKey is $clientHandshakeKey\n"
-printf "clientHandshakeIV is $clientHandshakeIV\n"
-printf "serverHandshakeKey is $serverHandshakeKey\n"
-printf "serverHandshakeIV is $serverHandshakeIV\n"
-
-#echo $clientFinishedKey
-#echo $serverFinishedKey
+#printf "derivedSecret is $derivedSecret\n"
+#printf "handshakeSecret is $handshakeSecret\n"
+#printf "sha384HashedMessage is $sha384HashedMessage\n"
+#printf "clientHandshakeTraffic is $clientHandshakeTraffic\n"
+#printf "serverHandshakeTraffic is $serverHandshakeTraffic\n"
+#printf "clientHandshakeKey is $clientHandshakeKey\n"
+#printf "clientHandshakeIV is $clientHandshakeIV\n"
+#printf "serverHandshakeKey is $serverHandshakeKey\n"
+#printf "serverHandshakeIV is $serverHandshakeIV\n"
 
 ckey="${clientHandshakeKey}" civ="${clientHandshakeIV}" skey="${serverHandshakeKey}" siv="${serverHandshakeIV}" yq -n "
     (.handshake.clientkey = env(ckey)) |
