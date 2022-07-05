@@ -1,6 +1,6 @@
 #!/bin/bash
 
-data=$(cat resp.bin)
+data=$1
 IFS=, packet=(${data//1[4,6,7]0303/,})
 
 serverhello=$(printf "160303%s" ${packet[1]})

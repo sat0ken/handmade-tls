@@ -4,6 +4,8 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/binary"
+	"encoding/hex"
+
 	//"encoding/hex"
 	"flag"
 	"fmt"
@@ -11,13 +13,14 @@ import (
 )
 
 type TLSInfo struct {
-	key []byte
-	iv []byte
-	message  []byte
+	key     []byte
+	iv      []byte
+	message []byte
+	seqnum  uint
 }
 
 // TLSメッセージのシーケンス番号を8byteのnonceにして返す
-func getNonce(i, length int) []byte {
+func getNonce(i, length uint) []byte {
 	b := make([]byte, length)
 	binary.BigEndian.PutUint64(b, uint64(i))
 	return b
@@ -45,20 +48,27 @@ func encryptClientMessage(tlsinfo TLSInfo) {
 	encmessage := aesgcm.Seal(nil, nonce, tlsinfo.message, add)
 
 	fmt.Printf("message is %s\n", encmessage)
-
 }
 
 func decryptServerMessage(tlsinfo TLSInfo) {
-	var nonce, add []byte
+	header := tlsinfo.message[0:5]
+	chiphertext := tlsinfo.message[5:]
+	nonce := getNonce(tlsinfo.seqnum, 8)
+	xoronce := getXORNonce(nonce, tlsinfo.iv)
 
 	block, _ := aes.NewCipher(tlsinfo.key)
 	aesgcm, _ := cipher.NewGCM(block)
 
-	plainmessage, err := aesgcm.Open(nil, nonce, tlsinfo.message, add)
+	plaintext, err := aesgcm.Open(nil, xoronce, chiphertext, header)
 	if err != nil {
-		log.Fatalf("decrypt message err : %x\n", err)
+		log.Fatalf("decrypt message err : %s\n", err)
 	}
-	fmt.Printf("message is %s\n", plainmessage)
+	fmt.Printf("plaintext is %x\n", plaintext[:len(plaintext)-1])
+}
+
+func strtobyte(str string) []byte {
+	b, _ := hex.DecodeString(str)
+	return b
 }
 
 func main() {
@@ -66,22 +76,22 @@ func main() {
 	iv := flag.String("iv", "", "iv")
 	enc := flag.String("enc", "", "encrypt message")
 	dec := flag.String("dec", "", "decrypt message")
+	seqnum := flag.Uint("seqnum", 0, "handshake message count")
 	flag.Parse()
 
 	tlsinfo := TLSInfo{
-		key: []byte(*key),
-		iv: []byte(*iv),
+		key:    strtobyte(*key),
+		iv:     strtobyte(*iv),
+		seqnum: *seqnum,
 	}
 
 	if *enc != "" {
-		tlsinfo.message = []byte(*enc)
-		fmt.Printf("%x\n", tlsinfo.key)
-		//encryptClientMessage(tlsinfo)
+		tlsinfo.message = strtobyte(*enc)
+		encryptClientMessage(tlsinfo)
 	}
 	if *dec != "" {
-		tlsinfo.message = []byte(*enc)
-		fmt.Printf("%+v\n", tlsinfo)
-		//decryptServerMessage(tlsinfo)
+		tlsinfo.message = strtobyte(*dec)
+		decryptServerMessage(tlsinfo)
 	}
 
 }

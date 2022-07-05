@@ -4,7 +4,7 @@
 keyshare=$(openssl pkey -noout -text < private.key | grep pub -A3 | grep -v pub | sed -e "s/://g" -e "s/ //g" -z -e "s/\\n//g")
 
 # 公開鍵をTLS ExtensionのKeyshareにセットする
-sed -i -e "s/KeyExchange: .*/KeyExchange: $keyshare/" chello.yaml
+sed -i -e "s/keyExchange: .*/keyExchange: $keyshare/" chello.yaml
 
 # CLiehtHelloメッセージを作成していく
 chMessage=$(yq '[.handshakeProtocol.version, .handshakeProtocol.random]' chello.yaml | yq 'join("")')
