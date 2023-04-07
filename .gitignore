@@ -1,8 +1,5 @@
-private.key
-*.pem
 .idea
 resp.bin
 tools/x25519
 tools/encrypt
-shello.yaml
-key.yaml
+tools/sock
